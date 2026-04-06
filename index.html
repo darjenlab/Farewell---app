@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Farewell Evening</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{--gold:#C9A84C;--gold-light:#E8C97A;--gold-dim:#8C6F2E;--cream:#FAF6EE;--ink:#1A1410;--muted:#8A7660;--surface:#FFF9F0;--border:rgba(201,168,76,.22);--border-strong:rgba(201,168,76,.45);--radius:16px;--green:#1a7a1a}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Jost',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 50% at 50% -10%,rgba(201,168,76,.13) 0%,transparent 65%),radial-gradient(ellipse 40% 30% at 90% 80%,rgba(201,168,76,.07) 0%,transparent 60%);pointer-events:none;z-index:0}
+.wrap{max-width:680px;margin:0 auto;padding:0 1.25rem 5rem;position:relative;z-index:1}
+
+header{text-align:center;padding:3.5rem 1rem 2rem}
+.orn{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:1.5rem}
+.ol{flex:1;max-width:90px;height:1px;background:linear-gradient(90deg,transparent,var(--gold))}.or{background:linear-gradient(90deg,var(--gold),transparent)}
+.od{width:9px;height:9px;background:var(--gold);transform:rotate(45deg);flex-shrink:0}.od-sm{width:5px;height:5px;background:var(--gold-dim);transform:rotate(45deg);flex-shrink:0}
+.ev-lbl{font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold-dim);font-weight:500;margin-bottom:.8rem}
+#ev-title{font-family:'Cormorant Garamond',serif;font-size:clamp(34px,8vw,58px);font-weight:700;line-height:1.1;color:var(--ink);margin-bottom:.6rem;font-style:italic}
+.venue-row{font-size:13px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:.3rem;font-weight:300}
+.vd{width:3px;height:3px;background:var(--gold);border-radius:50%;flex-shrink:0}
+.date-row{font-size:12px;color:var(--muted);font-weight:300;letter-spacing:.04em}
+
+.cd-section{margin:2rem 0 2.5rem}
+.cd-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.cd-cell{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.2rem .5rem 1rem;text-align:center;position:relative;overflow:hidden}
+.cd-cell::after{content:'';position:absolute;top:0;left:15%;right:15%;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.cd-num{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,6vw,42px);font-weight:600;display:block;line-height:1;color:var(--ink)}
+.cd-lbl{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:5px;display:block;font-weight:400}
+
+.section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.75rem;margin-bottom:1.25rem;animation:fadeUp .3s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.sec-hdr{display:flex;align-items:center;gap:12px;margin-bottom:1.25rem}
+.sec-icon{width:32px;height:32px;border-radius:10px;background:rgba(201,168,76,.12);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.sec-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--ink)}
+
+/* Announcements */
+.ann-item{background:var(--cream);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:0 10px 10px 0;padding:11px 15px;margin-bottom:10px}
+.ann-meta{font-size:11px;color:var(--muted);margin-bottom:5px;font-weight:300}
+.ann-text{font-size:14px;line-height:1.75;color:var(--ink)}
+.empty-state{text-align:center;padding:2.5rem 1rem;color:var(--muted);font-family:'Cormorant Garamond',serif;font-size:16px;font-style:italic}
+
+/* Payment */
+.deadline-banner{background:rgba(201,168,76,.1);border:1px solid var(--border-strong);border-radius:10px;padding:13px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.deadline-icon{font-size:18px;flex-shrink:0}
+.deadline-txt{font-size:13px;color:var(--ink);line-height:1.55}
+.deadline-txt strong{color:var(--gold-dim)}
+.pay-btn{display:block;width:100%;padding:17px;background:var(--gold);color:var(--ink);border:none;border-radius:12px;font-family:'Jost',sans-serif;font-size:16px;font-weight:500;text-align:center;text-decoration:none;cursor:pointer;transition:background .2s,transform .1s;margin-bottom:10px;letter-spacing:.02em}
+.pay-btn:hover{background:var(--gold-light)}.pay-btn:active{transform:scale(.98)}
+.pay-sub{font-size:12px;color:var(--muted);text-align:center;margin-bottom:16px;font-weight:300}
+.divider{display:flex;align-items:center;gap:10px;margin:16px 0;font-size:11px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;font-weight:300}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border-strong)}
+.qr-row{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.qr-box{width:130px;height:130px;flex-shrink:0;border:1px solid var(--border-strong);border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.qr-box img{width:100%;height:100%;object-fit:contain}
+.qr-no{font-size:13px;color:var(--muted);text-align:center;font-style:italic;padding:1rem}
+.upi-detail{font-size:13px;color:var(--muted);margin-top:6px;font-weight:300}.upi-detail strong{color:var(--ink);font-weight:500}
+
+/* Paid toggle */
+.paid-toggle{margin-top:16px;background:var(--cream);border:1px solid var(--border-strong);border-radius:12px;overflow:hidden}
+.paid-toggle-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;user-select:none}
+.paid-toggle-lbl{font-size:14px;font-weight:500;color:var(--ink);display:flex;align-items:center;gap:8px}
+.paid-toggle-arrow{font-size:12px;color:var(--muted);transition:transform .2s}
+.paid-toggle-arrow.open{transform:rotate(180deg)}
+.paid-toggle-body{padding:0 16px 16px;display:none}
+.paid-toggle-body.open{display:block}
+.confirm-btn{display:block;width:100%;padding:14px;background:var(--green);color:#fff;border:none;border-radius:10px;font-family:'Jost',sans-serif;font-size:15px;font-weight:500;text-align:center;text-decoration:none;cursor:pointer;transition:opacity .2s;letter-spacing:.02em}
+.confirm-btn:hover{opacity:.88}
+.paid-note{font-size:12px;color:var(--muted);text-align:center;margin-top:8px;line-height:1.5;font-weight:300}
+
+/* Performances */
+.perf-card{display:flex;align-items:center;justify-content:space-between;background:var(--cream);border:1px solid var(--border);border-radius:10px;padding:11px 15px;margin-bottom:8px}
+.perf-name{font-size:14px;font-weight:500;color:var(--ink)}.perf-class{font-size:12px;color:var(--muted);margin-top:1px;font-weight:300}
+.perf-right{display:flex;align-items:center;gap:8px}
+.tag{font-size:11px;padding:3px 11px;border-radius:999px;font-weight:500}
+.tag-dance{background:#EBF3FD;color:#1A5FAB}.tag-music{background:#EDFAED;color:#1A7A1A}
+.tag-drama{background:#FFF5E0;color:#8A5A00}.tag-standup{background:#F5EDF9;color:#6A2D8A}.tag-other{background:#F2EFE8;color:#5A4E3A}
+.dur{font-size:12px;color:var(--muted);font-weight:300}
+
+/* Performance Registration form */
+.reg-divider{display:flex;align-items:center;gap:10px;margin:1.25rem 0;font-size:11px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;font-weight:300}
+.reg-divider::before,.reg-divider::after{content:'';flex:1;height:1px;background:var(--border-strong)}
+.reg-form{background:var(--cream);border:1px solid var(--border-strong);border-radius:12px;padding:1.25rem}
+.reg-form-title{font-size:14px;font-weight:500;color:var(--ink);margin-bottom:1rem}
+.field{margin-bottom:10px}
+.field label{display:block;font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;font-weight:500}
+.field input,.field select{width:100%;padding:10px 13px;background:var(--surface);border:1px solid var(--border-strong);border-radius:9px;font-family:'Jost',sans-serif;font-size:14px;color:var(--ink);outline:none;transition:border-color .2s,box-shadow .2s;font-weight:300}
+.field input:focus,.field select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.1)}
+.field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A7660' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:34px;background-color:var(--surface)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:400px){.row2{grid-template-columns:1fr}}
+.reg-submit{width:100%;padding:13px;background:var(--ink);color:var(--cream);border:none;border-radius:10px;font-family:'Jost',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:opacity .2s;margin-top:4px;letter-spacing:.02em}
+.reg-submit:hover{opacity:.82}
+.reg-success{display:none;text-align:center;padding:14px;color:var(--green);font-size:14px;background:#EDFAED;border-radius:10px;margin-top:10px}
+
+/* Suggestion box */
+.sug-area{display:flex;flex-direction:column;gap:10px}
+.sug-input,.sug-name-in{width:100%;padding:11px 15px;background:var(--cream);border:1px solid var(--border-strong);border-radius:10px;font-family:'Jost',sans-serif;font-size:14px;color:var(--ink);outline:none;transition:border-color .2s,box-shadow .2s;font-weight:300}
+.sug-input{resize:vertical;min-height:85px;line-height:1.65}
+.sug-input:focus,.sug-name-in:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.1)}
+.sug-submit{width:100%;padding:13px;background:var(--ink);color:var(--cream);border:none;border-radius:10px;font-family:'Jost',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:opacity .2s;letter-spacing:.02em}
+.sug-submit:hover{opacity:.82}
+.sug-ok{display:none;text-align:center;padding:14px;color:var(--green);font-size:14px;background:#EDFAED;border-radius:10px}
+
+.loading{text-align:center;padding:2rem;color:var(--muted);font-size:13px;font-style:italic}
+.loading::after{content:'';display:inline-block;width:14px;height:14px;border:2px solid var(--border-strong);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;margin-left:8px;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+footer{text-align:center;padding:2rem 0 1rem;font-size:12px;color:var(--muted);font-weight:300;letter-spacing:.04em}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="orn"><div class="ol"></div><div class="od-sm"></div><div class="od"></div><div class="od-sm"></div><div class="ol or"></div></div>
+    <div class="ev-lbl">You are cordially invited</div>
+    <div id="ev-title">Farewell Evening</div>
+    <div class="venue-row"><div class="vd"></div><span id="ev-venue">Alwin Memorial Public School</span><div class="vd"></div><span id="ev-time">4:00 PM</span></div>
+    <div class="date-row" id="ev-date"></div>
+  </header>
+
+  <div class="cd-section">
+    <div class="cd-grid">
+      <div class="cd-cell"><span class="cd-num" id="cd-d">--</span><span class="cd-lbl">Days</span></div>
+      <div class="cd-cell"><span class="cd-num" id="cd-h">--</span><span class="cd-lbl">Hours</span></div>
+      <div class="cd-cell"><span class="cd-num" id="cd-m">--</span><span class="cd-lbl">Minutes</span></div>
+      <div class="cd-cell"><span class="cd-num" id="cd-s">--</span><span class="cd-lbl">Seconds</span></div>
+    </div>
+  </div>
+
+  <!-- Announcements -->
+  <div class="section">
+    <div class="sec-hdr"><div class="sec-icon">📢</div><div class="sec-title">Announcements</div></div>
+    <div id="ann-list"><div class="loading">Loading</div></div>
+  </div>
+
+  <!-- Contribute -->
+  <div class="section">
+    <div class="sec-hdr"><div class="sec-icon">💸</div><div class="sec-title">Contribute</div></div>
+    <div id="pay-area"><div class="loading">Loading</div></div>
+  </div>
+
+  <!-- Performances -->
+  <div class="section">
+    <div class="sec-hdr"><div class="sec-icon">🎭</div><div class="sec-title">Performances</div></div>
+    <div id="perf-list"><div class="loading">Loading</div></div>
+
+    <div class="reg-divider">Register your performance</div>
+    <div class="reg-form">
+      <div class="reg-form-title">🎤 Want to perform? Sign up below!</div>
+      <div class="row2">
+        <div class="field"><label>Full name</label><input type="text" id="reg-name" placeholder="Your name"/></div>
+        <div class="field"><label>Class / Group</label><input type="text" id="reg-class" placeholder="e.g. 12-A"/></div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Performance type</label>
+          <select id="reg-type">
+            <option value="">Select...</option>
+            <option>Dance</option><option>Music</option><option>Drama</option>
+            <option>Standup</option><option>Other</option>
+          </select>
+        </div>
+        <div class="field"><label>Duration (mins)</label><input type="text" id="reg-dur" placeholder="e.g. 5"/></div>
+      </div>
+      <button class="reg-submit" onclick="registerPerf()">Register for performance ✨</button>
+      <div class="reg-success" id="reg-ok">🎉 You're registered! We'll add you to the lineup soon.</div>
+    </div>
+  </div>
+
+  <!-- Suggestions -->
+  <div class="section">
+    <div class="sec-hdr"><div class="sec-icon">💬</div><div class="sec-title">Suggestions & Feedback</div></div>
+    <div class="sug-area">
+      <textarea class="sug-input" id="sug-text" placeholder="Have a suggestion or feedback for the event? Share it here..."></textarea>
+      <input class="sug-name-in" id="sug-name" type="text" placeholder="Your name (optional)"/>
+      <button class="sug-submit" onclick="submitSug()">Send suggestion</button>
+      <div class="sug-ok" id="sug-ok">✓ Thank you! Your suggestion has been sent.</div>
+    </div>
+  </div>
+
+  <footer>Made with ♡ for the farewell</footer>
+</div>
+
+<script>
+var SUPA_URL='https://qzjjsrjhtnqndbqiirgh.supabase.co';
+var SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF6ampzcmpodG5xbmRicWlpcmdoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0MDY3MjUsImV4cCI6MjA5MDk4MjcyNX0.0tOeVUBI--YWVeZc9Y-xBEb7p5VY5YOa8hnfbz8EtGU';
+var FORM_URL='https://docs.google.com/forms/d/e/1FAIpQLScyP7TYUu4gEkN28QJ08YHI5xCVC7Lv8ts_ooBS4cHC-gsSNQ/viewform';
+var TARGET=null;
+
+function api(path,opts){
+  return fetch(SUPA_URL+'/rest/v1/'+path,Object.assign({
+    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=representation'}
+  },opts||{})).then(function(r){return r.json()}).catch(function(){return null});
+}
+
+/* Settings */
+function loadSettings(){
+  api('settings?select=key,value').then(function(rows){
+    var s={};(rows||[]).forEach(function(r){s[r.key]=r.value});
+    if(s.title)document.getElementById('ev-title').textContent=s.title;
+    if(s.venue)document.getElementById('ev-venue').textContent=s.venue;
+    var time=s.time||'16:00';
+    var h=+time.split(':')[0],mn=time.split(':')[1];
+    document.getElementById('ev-time').textContent=(h%12||12)+':'+mn+' '+(h>=12?'PM':'AM');
+    if(s.date){
+      var p=s.date.split('-').map(Number),tp=time.split(':');
+      TARGET=new Date(p[0],p[1]-1,p[2],+tp[0],+tp[1],0,0);
+      document.getElementById('ev-date').textContent=TARGET.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    }else{
+      var d=new Date(),day=d.getDay(),diff=(6-day+7)%7||7;
+      d.setDate(d.getDate()+diff);d.setHours(16,0,0,0);TARGET=d;
+      document.getElementById('ev-date').textContent=d.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    }
+    tick();
+  });
+}
+
+/* Countdown */
+function tick(){
+  if(!TARGET)return;
+  var diff=TARGET-new Date();
+  if(diff<=0){['cd-d','cd-h','cd-m','cd-s'].forEach(function(id){document.getElementById(id).textContent='00'});return}
+  var d=Math.floor(diff/86400000);diff-=d*86400000;
+  var h=Math.floor(diff/3600000);diff-=h*3600000;
+  var m=Math.floor(diff/60000);diff-=m*60000;var s=Math.floor(diff/1000);
+  document.getElementById('cd-d').textContent=String(d).padStart(2,'0');
+  document.getElementById('cd-h').textContent=String(h).padStart(2,'0');
+  document.getElementById('cd-m').textContent=String(m).padStart(2,'0');
+  document.getElementById('cd-s').textContent=String(s).padStart(2,'0');
+}
+setInterval(tick,1000);
+
+/* Announcements */
+function loadAnn(){
+  api('announcements?select=*&order=created_at.desc').then(function(rows){
+    var el=document.getElementById('ann-list');
+    if(!rows||!rows.length){el.innerHTML='<div class="empty-state">Check back for announcements!</div>';return}
+    el.innerHTML=rows.map(function(a){
+      var d=new Date(a.created_at);
+      var meta=d.toLocaleDateString('en-IN',{day:'numeric',month:'short'})+' · '+d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+      return '<div class="ann-item"><div class="ann-meta">'+meta+'</div><div class="ann-text">'+a.text.replace(/\n/g,'<br>')+'</div></div>';
+    }).join('');
+  });
+}
+
+/* Payment */
+function loadPay(){
+  api('settings?select=key,value&key=in.(upi,amt,payee,deadline,qr)').then(function(rows){
+    var s={};(rows||[]).forEach(function(r){s[r.key]=r.value});
+    var upi=s.upi||'',amt=s.amt||'70',deadline=s.deadline||'Wednesday morning',qr=s.qr||'';
+    var upiLink='';
+    if(upi)upiLink='upi://pay?pa='+encodeURIComponent(upi)+'&pn='+encodeURIComponent(s.payee||'Farewell')+'&am='+encodeURIComponent(amt)+'&cu=INR&tn=Farewell+contribution';
+    var mob=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    var out='';
+
+    /* Deadline banner */
+    if(deadline){out+='<div class="deadline-banner"><div class="deadline-icon">⏰</div><div class="deadline-txt">Please contribute by <strong>'+deadline+'</strong>. Your support means the world to us! 🙏</div></div>'}
+
+    /* Pay button */
+    if(upiLink&&mob){
+      out+='<a class="pay-btn" href="'+upiLink+'">💳 Pay ₹'+amt+' for Farewell</a>';
+      out+='<div class="pay-sub">Tap to open GPay / PhonePe / Paytm</div>';
+    }
+
+    /* QR for desktop */
+    if(qr||upi){
+      if(mob&&upiLink)out+='<div class="divider">or scan QR</div>';
+      out+='<div class="qr-row"><div class="qr-box">'+(qr?'<img src="'+qr+'" alt="QR"/>':'<div class="qr-no">QR coming soon</div>')+'</div>';
+      out+='<div>';
+      if(!mob&&upiLink)out+='<a class="pay-btn" href="'+upiLink+'" style="width:auto;padding:12px 20px;display:inline-block;margin-bottom:10px;">💳 Pay ₹'+amt+' for Farewell</a>';
+      if(upi)out+='<div class="upi-detail">UPI: <strong>'+upi+'</strong></div>';
+      out+='<div class="upi-detail" style="margin-top:4px;">Amount: <strong>₹'+amt+'</strong></div>';
+      out+='</div></div>';
+    }
+    if(!upiLink&&!qr&&!upi)out='<div class="empty-state">Payment details coming soon!</div>';
+
+    /* Confirm payment — hidden behind toggle */
+    out+='<div class="paid-toggle">'+
+      '<div class="paid-toggle-hdr" onclick="togglePaid(this)">'+
+        '<div class="paid-toggle-lbl">✅ I have paid — confirm here</div>'+
+        '<div class="paid-toggle-arrow">▼</div>'+
+      '</div>'+
+      '<div class="paid-toggle-body">'+
+        '<p style="font-size:13px;color:var(--muted);margin-bottom:12px;font-weight:300;line-height:1.6;">Great! Please fill out the quick form below so we can confirm your payment. Takes less than a minute.</p>'+
+        '<a class="confirm-btn" href="'+FORM_URL+'" target="_blank">Open confirmation form ↗</a>'+
+        '<div class="paid-note">Your name and transaction ID help us verify quickly 🙏</div>'+
+      '</div>'+
+    '</div>';
+
+    document.getElementById('pay-area').innerHTML=out;
+  });
+}
+
+function togglePaid(hdr){
+  var body=hdr.nextElementSibling;
+  var arrow=hdr.querySelector('.paid-toggle-arrow');
+  body.classList.toggle('open');
+  arrow.classList.toggle('open');
+}
+
+/* Performances */
+function loadPerf(){
+  api('performances?select=*&order=created_at.asc').then(function(rows){
+    var el=document.getElementById('perf-list');
+    if(!rows||!rows.length){el.innerHTML='<div class="empty-state">No performances listed yet — be the first to register below! 🎭</div>';return}
+    var tm={Dance:'tag-dance',Music:'tag-music',Drama:'tag-drama',Standup:'tag-standup',Other:'tag-other'};
+    el.innerHTML=rows.map(function(p){
+      return '<div class="perf-card"><div><div class="perf-name">'+p.name+'</div>'+(p.class?'<div class="perf-class">'+p.class+'</div>':'')+
+      '</div><div class="perf-right">'+(p.duration?'<span class="dur">'+p.duration+'m</span>':'')+
+      '<span class="tag '+(tm[p.type]||'tag-other')+'">'+p.type+'</span></div></div>';
+    }).join('');
+  });
+}
+
+function registerPerf(){
+  var name=document.getElementById('reg-name').value.trim();
+  var cls=document.getElementById('reg-class').value.trim();
+  var type=document.getElementById('reg-type').value;
+  var dur=document.getElementById('reg-dur').value.trim();
+  if(!name){alert('Please enter your name!');return}
+  if(!type){alert('Please select your performance type!');return}
+  api('performances',{method:'POST',body:JSON.stringify({name:name,class:cls||null,type:type,duration:dur||null})}).then(function(res){
+    if(res&&res[0]&&res[0].id){
+      document.getElementById('reg-name').value='';
+      document.getElementById('reg-class').value='';
+      document.getElementById('reg-type').value='';
+      document.getElementById('reg-dur').value='';
+      document.getElementById('reg-ok').style.display='block';
+      setTimeout(function(){document.getElementById('reg-ok').style.display='none'},4000);
+      loadPerf();
+    }else{
+      alert('Something went wrong. Please try again!');
+    }
+  });
+}
+
+/* Suggestions */
+function submitSug(){
+  var txt=document.getElementById('sug-text').value.trim();
+  if(!txt){alert('Please write something first!');return}
+  var name=document.getElementById('sug-name').value.trim();
+  api('suggestions',{method:'POST',body:JSON.stringify({text:txt,author_name:name||null})}).then(function(){
+    document.getElementById('sug-text').value='';
+    document.getElementById('sug-name').value='';
+    document.getElementById('sug-ok').style.display='block';
+    setTimeout(function(){document.getElementById('sug-ok').style.display='none'},3500);
+  });
+}
+
+/* Init */
+loadSettings();loadAnn();loadPay();loadPerf();
+setInterval(function(){loadAnn();loadPay();loadPerf();},30000);
+</script>
+</body>
+</html>

@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Farewell — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{--gold:#C9A84C;--gold-light:#E8C97A;--gold-dim:#8C6F2E;--cream:#FAF6EE;--ink:#1A1410;--muted:#8A7660;--surface:#FFF9F0;--border:rgba(201,168,76,.22);--border-strong:rgba(201,168,76,.45);--radius:14px;--red:#c0392b;--green:#1a7a1a}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Jost',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 50% at 50% -10%,rgba(201,168,76,.12) 0%,transparent 65%);pointer-events:none;z-index:0}
+
+/* Lock */
+.lock-screen{position:fixed;inset:0;background:var(--cream);display:flex;align-items:center;justify-content:center;z-index:100;padding:2rem}
+.lock-card{background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--radius);padding:2.5rem 2rem;width:100%;max-width:360px;text-align:center}
+.lock-icon{font-size:38px;margin-bottom:1rem}
+.lock-title{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;margin-bottom:.4rem}
+.lock-sub{font-size:13px;color:var(--muted);margin-bottom:1.5rem;font-weight:300}
+.lock-input{width:100%;padding:12px 14px;border:1px solid var(--border-strong);border-radius:10px;font-size:16px;text-align:center;letter-spacing:.2em;background:var(--cream);color:var(--ink);outline:none;font-family:'Jost',sans-serif}
+.lock-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.12)}
+.lock-error{font-size:12px;color:var(--red);margin-top:8px;min-height:16px}
+
+.app{max-width:720px;margin:0 auto;padding:0 1.25rem 5rem;position:relative;z-index:1;display:none}
+header{text-align:center;padding:2.5rem 1rem 1.5rem}
+.admin-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(201,168,76,.15);border:1px solid var(--border-strong);border-radius:999px;padding:4px 16px;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold-dim);font-weight:500;margin-bottom:1rem}
+.ev-label{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-dim);font-weight:400;margin-bottom:.5rem}
+#hdr-title{font-family:'Cormorant Garamond',serif;font-size:clamp(26px,6vw,40px);font-weight:700;line-height:1.15;margin-bottom:.4rem;font-style:italic}
+.venue-line{font-size:13px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;font-weight:300}
+.vdot{width:3px;height:3px;background:var(--gold);border-radius:50%}
+
+.cd-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:1.5rem 0}
+.cd-cell{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1rem .5rem .8rem;text-align:center;position:relative;overflow:hidden}
+.cd-cell::after{content:'';position:absolute;top:0;left:15%;right:15%;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.cd-num{font-family:'Cormorant Garamond',serif;font-size:clamp(22px,5vw,34px);font-weight:600;display:block;line-height:1}
+.cd-lbl{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:4px;display:block;font-weight:300}
+
+.tabs{display:flex;gap:3px;background:var(--surface);border:1px solid var(--border);border-radius:50px;padding:4px;margin-bottom:1.5rem;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab-btn{flex:1;min-width:58px;padding:7px 5px;border:none;background:none;cursor:pointer;border-radius:50px;font-family:'Jost',sans-serif;font-size:11px;color:var(--muted);transition:all .2s;white-space:nowrap;font-weight:400}
+.tab-btn.active{background:var(--gold);color:var(--ink);font-weight:500}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1rem;display:none;animation:fadeUp .25s ease}
+.card.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.card-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:var(--ink);margin-bottom:1rem;display:flex;align-items:center;gap:10px;font-style:italic}
+.card-icon{width:30px;height:30px;border-radius:9px;background:rgba(201,168,76,.13);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+
+.field{margin-bottom:12px}
+.field label{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;font-weight:500}
+.field input,.field select,.field textarea{width:100%;background:var(--cream);border:1px solid var(--border-strong);border-radius:10px;padding:10px 14px;font-family:'Jost',sans-serif;font-size:14px;color:var(--ink);outline:none;transition:border-color .2s,box-shadow .2s;font-weight:300}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.1)}
+.field textarea{resize:vertical;min-height:80px;line-height:1.65}
+.field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A7660' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:420px){.row2{grid-template-columns:1fr}}
+
+.btn-gold{width:100%;padding:12px;background:var(--gold);color:var(--ink);border:none;border-radius:10px;font-family:'Jost',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:background .2s,transform .1s;letter-spacing:.02em}
+.btn-gold:hover{background:var(--gold-light)}.btn-gold:active{transform:scale(.98)}
+.btn-outline{width:100%;padding:11px;background:transparent;color:var(--muted);border:1px solid var(--border-strong);border-radius:10px;font-family:'Jost',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;margin-top:8px}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold-dim)}
+
+/* Announcements */
+.ann-feed{margin-top:1rem;display:flex;flex-direction:column;gap:10px}
+.ann-item{background:var(--cream);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:0 10px 10px 0;padding:10px 14px}
+.ann-meta{font-size:11px;color:var(--muted);margin-bottom:4px;display:flex;align-items:center;justify-content:space-between;font-weight:300}
+.ann-text{font-size:14px;line-height:1.7;color:var(--ink);font-weight:300}
+.ann-empty{text-align:center;padding:2rem;color:var(--muted);font-size:14px;font-style:italic}
+.del-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:0 4px;line-height:1;transition:color .15s}
+.del-btn:hover{color:var(--red)}
+.quick-label{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:7px;font-weight:500}
+.quick-list{display:flex;flex-direction:column;gap:7px;margin-bottom:1rem}
+.quick-btn{padding:9px 14px;background:var(--cream);border:1px solid var(--border-strong);border-radius:8px;font-family:'Jost',sans-serif;font-size:12px;color:var(--ink);text-align:left;cursor:pointer;line-height:1.55;transition:border-color .15s;font-weight:300}
+.quick-btn:hover{border-color:var(--gold)}
+.divider{display:flex;align-items:center;gap:10px;margin:12px 0;font-size:11px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;font-weight:300}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border-strong)}
+
+/* Payment */
+.pay-preview{background:var(--cream);border:1px solid var(--border-strong);border-radius:var(--radius);padding:1.25rem;margin-top:1rem}
+.preview-lbl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;font-weight:500}
+.pay-demo{display:block;width:100%;padding:14px;background:var(--gold);color:var(--ink);border:none;border-radius:10px;font-family:'Jost',sans-serif;font-size:15px;font-weight:500;text-align:center;cursor:default;margin-bottom:6px}
+.pay-sub-demo{font-size:11px;color:var(--muted);text-align:center;margin-bottom:12px;font-weight:300}
+.qr-upload-row{display:flex;align-items:center;gap:14px}
+.qr-thumb{width:68px;height:68px;border:2px dashed var(--border-strong);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;flex-shrink:0;overflow:hidden;transition:border-color .2s}
+.qr-thumb:hover{border-color:var(--gold)}
+.qr-thumb img{width:100%;height:100%;object-fit:contain}
+.qr-hint{font-size:12px;color:var(--muted);line-height:1.55;font-weight:300}
+.note-box{background:rgba(201,168,76,.07);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--muted);line-height:1.65;margin-top:12px;font-weight:300}
+
+/* Performances */
+.reg-list{margin-top:1.25rem;display:flex;flex-direction:column;gap:8px}
+.reg-card{display:flex;align-items:center;justify-content:space-between;background:var(--cream);border:1px solid var(--border);border-radius:10px;padding:10px 14px}
+.reg-name{font-size:14px;font-weight:500;color:var(--ink)}.reg-cls{font-size:12px;color:var(--muted);margin-top:1px;font-weight:300}
+.reg-right{display:flex;align-items:center;gap:8px}
+.tag{font-size:11px;padding:3px 10px;border-radius:999px;font-weight:500}
+.tag-dance{background:#EBF3FD;color:#1A5FAB}.tag-music{background:#EDFAED;color:#1A7A1A}
+.tag-drama{background:#FFF5E0;color:#8A5A00}.tag-standup{background:#F5EDF9;color:#6A2D8A}.tag-other{background:#F2EFE8;color:#5A4E3A}
+.dur-txt{font-size:12px;color:var(--muted);font-weight:300}
+.summ-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(88px,1fr));gap:8px;margin-top:1rem}
+.summ-cell{background:var(--cream);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center}
+.summ-num{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--gold-dim)}
+.summ-lbl{font-size:11px;color:var(--muted);margin-top:2px;font-weight:300}
+
+/* Tracker */
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.25rem}
+.stat-cell{background:var(--cream);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:var(--gold-dim)}
+.stat-lbl{font-size:11px;color:var(--muted);margin-top:2px;font-weight:300}
+.tracker-table{width:100%;border-collapse:collapse;font-size:13px}
+.tracker-table th{text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;padding:6px 10px;border-bottom:1px solid var(--border-strong)}
+.tracker-table td{padding:9px 10px;border-bottom:1px solid var(--border);color:var(--ink);vertical-align:middle;font-weight:300}
+.tracker-table tr:last-child td{border-bottom:none}
+.paid-badge{background:#EDFAED;color:#1a7a1a;font-size:11px;padding:3px 9px;border-radius:999px;font-weight:500}
+.txn{font-size:11px;color:var(--muted);font-family:monospace}
+.tracker-empty{text-align:center;padding:2rem;color:var(--muted);font-size:14px;font-style:italic}
+.form-link{background:rgba(201,168,76,.07);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--muted);margin-bottom:1rem;line-height:1.6;font-weight:300}
+.form-link a{color:var(--gold-dim)}
+.manual-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.manual-row input{flex:1;min-width:90px;padding:8px 12px;background:var(--cream);border:1px solid var(--border-strong);border-radius:8px;font-family:'Jost',sans-serif;font-size:13px;color:var(--ink);outline:none;font-weight:300}
+.manual-row input:focus{border-color:var(--gold)}
+.btn-sm{padding:8px 16px;background:var(--gold);color:var(--ink);border:none;border-radius:8px;font-family:'Jost',sans-serif;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
+.btn-sm:hover{background:var(--gold-light)}
+
+/* Suggestions */
+.sug-item{background:var(--cream);border:1px solid var(--border);border-left:3px solid #7F77DD;border-radius:0 10px 10px 0;padding:10px 14px;margin-bottom:10px}
+.sug-meta{font-size:11px;color:var(--muted);margin-bottom:4px;display:flex;justify-content:space-between;font-weight:300}
+.sug-text{font-size:14px;line-height:1.65;color:var(--ink);font-weight:300}
+.sug-author{font-size:12px;color:var(--gold-dim);margin-top:4px;font-weight:500}
+.sug-empty{text-align:center;padding:2rem;color:var(--muted);font-size:14px;font-style:italic}
+
+/* Settings */
+.settings-note{font-size:12px;color:var(--muted);background:rgba(201,168,76,.07);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:1rem;line-height:1.65;font-weight:300}
+.live-badge{display:inline-flex;align-items:center;gap:5px;background:#EDFAED;color:#1a7a1a;font-size:11px;padding:3px 10px;border-radius:999px;font-weight:500;margin-bottom:1rem}
+.live-dot{width:6px;height:6px;border-radius:50%;background:#1a7a1a;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+.loading{text-align:center;padding:1.5rem;color:var(--muted);font-size:13px;font-style:italic;font-weight:300}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--cream);padding:10px 22px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:all .3s;z-index:999;white-space:nowrap;font-weight:300}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.logout-btn{position:fixed;top:12px;right:16px;z-index:50;background:none;border:1px solid var(--border-strong);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--muted);cursor:pointer;font-family:'Jost',sans-serif}
+.logout-btn:hover{border-color:var(--red);color:var(--red)}
+</style>
+</head>
+<body>
+
+<div class="lock-screen" id="lock-screen">
+  <div class="lock-card">
+    <div class="lock-icon">🔐</div>
+    <div class="lock-title">Admin Access</div>
+    <div class="lock-sub">Enter your password to manage the event</div>
+    <input class="lock-input" type="password" id="pwd-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')unlock()"/>
+    <div class="lock-error" id="lock-error"></div>
+    <button class="btn-gold" style="margin-top:1rem;" onclick="unlock()">Unlock</button>
+    <div style="margin-top:1rem;font-size:11px;color:var(--muted);">Default password: <strong>farewell2025</strong></div>
+  </div>
+</div>
+
+<button class="logout-btn" id="logout-btn" style="display:none;" onclick="logout()">🔒 Lock</button>
+
+<div class="app" id="main-app">
+  <header>
+    <div class="admin-badge">⚙️ Admin Panel</div>
+    <div class="ev-label">Managing event</div>
+    <div id="hdr-title">Farewell Evening</div>
+    <div class="venue-line">
+      <div class="vdot"></div><span id="hdr-venue">Alwin Memorial Public School</span>
+      <div class="vdot"></div><span id="hdr-time">4:00 PM</span>
+    </div>
+  </header>
+
+  <div class="cd-grid">
+    <div class="cd-cell"><span class="cd-num" id="cd-d">--</span><span class="cd-lbl">Days</span></div>
+    <div class="cd-cell"><span class="cd-num" id="cd-h">--</span><span class="cd-lbl">Hours</span></div>
+    <div class="cd-cell"><span class="cd-num" id="cd-m">--</span><span class="cd-lbl">Minutes</span></div>
+    <div class="cd-cell"><span class="cd-num" id="cd-s">--</span><span class="cd-lbl">Seconds</span></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('announce')">📢 Announce</button>
+    <button class="tab-btn" onclick="switchTab('money')">💸 Collect</button>
+    <button class="tab-btn" onclick="switchTab('tracker')">✅ Paid</button>
+    <button class="tab-btn" onclick="switchTab('perform')">🎭 Perform</button>
+    <button class="tab-btn" onclick="switchTab('suggestions')">💬 Suggest</button>
+    <button class="tab-btn" onclick="switchTab('settings')">⚙️ Settings</button>
+  </div>
+
+  <!-- Announcements -->
+  <div class="card active" id="tab-announce">
+    <div class="card-title"><div class="card-icon">📢</div>Post Announcements</div>
+    <div class="quick-label">Quick templates</div>
+    <div class="quick-list" id="quick-list"></div>
+    <div class="divider">or write your own</div>
+    <div class="field"><label>Custom announcement</label><textarea id="ann-text" placeholder="Type your announcement..."></textarea></div>
+    <button class="btn-gold" onclick="postAnn()">Post announcement</button>
+    <div id="ann-feed" class="ann-feed"><div class="loading">Loading...</div></div>
+  </div>
+
+  <!-- Collect -->
+  <div class="card" id="tab-money">
+    <div class="card-title"><div class="card-icon">💸</div>Collect Contributions</div>
+    <div class="row2">
+      <div class="field"><label>UPI ID</label><input type="text" id="upi-in" placeholder="yourname@upi" oninput="updatePreview()"/></div>
+      <div class="field"><label>Amount (₹)</label><input type="text" id="amt-in" value="70" oninput="updatePreview()"/></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Your name</label><input type="text" id="payee-in" placeholder="e.g. Rahul S"/></div>
+      <div class="field"><label>Deadline</label><input type="text" id="deadline-in" value="Wednesday morning"/></div>
+    </div>
+    <div class="pay-preview">
+      <div class="preview-lbl">Preview</div>
+      <div id="pay-demo" class="pay-demo">💳 Pay ₹70 for Farewell</div>
+      <div class="pay-sub-demo">Opens GPay / PhonePe / Paytm on mobile</div>
+      <div class="divider">QR fallback for desktop</div>
+      <div class="qr-upload-row">
+        <div class="qr-thumb" onclick="document.getElementById('qr-file').click()">
+          <span id="qr-icon">🔳</span><img id="qr-img" style="display:none;"/>
+        </div>
+        <input type="file" id="qr-file" accept="image/*" style="display:none;" onchange="uploadQR(event)"/>
+        <div class="qr-hint">Upload GPay / PhonePe QR image.<br/>Shown only on desktop.</div>
+      </div>
+    </div>
+    <div class="note-box">💡 Changes save to the database instantly — audience sees updates within 30 seconds without any resharing needed!</div>
+    <button class="btn-gold" style="margin-top:14px;" onclick="savePayInfo()">Save to database</button>
+  </div>
+
+  <!-- Tracker -->
+  <div class="card" id="tab-tracker">
+    <div class="card-title"><div class="card-icon">✅</div>Who Paid</div>
+    <div class="form-link">📋 Form submissions appear below. Also check your Google Sheet for live updates.<br/><a href="https://docs.google.com/forms/d/e/1FAIpQLScyP7TYUu4gEkN28QJ08YHI5xCVC7Lv8ts_ooBS4cHC-gsSNQ/viewform" target="_blank">Open Google Form ↗</a></div>
+    <div class="stat-grid">
+      <div class="stat-cell"><div class="stat-num" id="stat-count">0</div><div class="stat-lbl">Paid</div></div>
+      <div class="stat-cell"><div class="stat-num" id="stat-total">₹0</div><div class="stat-lbl">Collected</div></div>
+      <div class="stat-cell"><div class="stat-num" id="stat-pending">—</div><div class="stat-lbl">Pending</div></div>
+    </div>
+    <div id="tracker-body"><div class="loading">Loading...</div></div>
+    <div style="margin-top:1rem;">
+      <div class="quick-label">Mark as paid manually</div>
+      <div class="manual-row">
+        <input type="text" id="m-name" placeholder="Full name"/>
+        <input type="text" id="m-class" placeholder="Class"/>
+        <input type="text" id="m-amt" placeholder="₹ Amount"/>
+        <input type="text" id="m-txn" placeholder="Txn ID"/>
+        <button class="btn-sm" onclick="manualAdd()">+ Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Performances -->
+  <div class="card" id="tab-perform">
+    <div class="card-title"><div class="card-icon">🎭</div>Performance Registrations</div>
+    <div class="row2">
+      <div class="field"><label>Full name</label><input type="text" id="p-name" placeholder="Student name"/></div>
+      <div class="field"><label>Class / Group</label><input type="text" id="p-class" placeholder="e.g. 12-A"/></div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>Performance type</label>
+        <select id="p-type">
+          <option value="">Select...</option>
+          <option>Dance</option><option>Music</option><option>Drama</option>
+          <option>Standup</option><option>Other</option>
+        </select>
+      </div>
+      <div class="field"><label>Duration (mins)</label><input type="text" id="p-dur" placeholder="e.g. 5"/></div>
+    </div>
+    <button class="btn-gold" onclick="addPerf()">Add to lineup</button>
+    <div id="perf-list" class="reg-list"><div class="loading">Loading...</div></div>
+    <div id="perf-summ" class="summ-grid" style="display:none;"></div>
+  </div>
+
+  <!-- Suggestions -->
+  <div class="card" id="tab-suggestions">
+    <div class="card-title"><div class="card-icon">💬</div>Audience Suggestions</div>
+    <div id="sug-feed"><div class="loading">Loading...</div></div>
+  </div>
+
+  <!-- Settings -->
+  <div class="card" id="tab-settings">
+    <div class="card-title"><div class="card-icon">⚙️</div>Event Settings</div>
+    <div class="live-badge"><div class="live-dot"></div>Live — saves to database instantly</div>
+    <div class="settings-note">All changes reflect immediately for everyone viewing the audience page. No resharing needed!</div>
+    <div class="field"><label>Event name</label><input type="text" id="set-name" placeholder="e.g. Class 12 Grand Farewell"/></div>
+    <div class="row2">
+      <div class="field"><label>Date</label><input type="date" id="set-date"/></div>
+      <div class="field"><label>Time</label><input type="time" id="set-time"/></div>
+    </div>
+    <div class="field"><label>Venue</label><input type="text" id="set-venue"/></div>
+    <div class="field"><label>Expected headcount</label><input type="text" id="set-headcount" placeholder="e.g. 60"/></div>
+    <div class="field"><label>Change admin password</label><input type="password" id="set-pwd" placeholder="Leave blank to keep current"/></div>
+    <button class="btn-gold" onclick="saveSettings()">Save settings</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var PASS='farewell2025';
+var SUPA_URL='https://qzjjsrjhtnqndbqiirgh.supabase.co';
+var SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF6ampzcmpodG5xbmRicWlpcmdoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0MDY3MjUsImV4cCI6MjA5MDk4MjcyNX0.0tOeVUBI--YWVeZc9Y-xBEb7p5VY5YOa8hnfbz8EtGU';
+
+var TARGET=null;
+var HEADCOUNT=0;
+
+var QUICK=[
+  '🎁 Hey everyone! We are presenting a memento to our beloved Chairman Sir as a token of our love and gratitude. Every contribution counts — please pay ₹65 before Wednesday morning. Let\'s make this gesture truly special! 🙏',
+  '⏰ Reminder: Deadline to contribute for Chairman Sir\'s memento is Wednesday morning. Please pay ₹65 at the earliest. Don\'t miss being part of this beautiful gesture!',
+  '🎉 The farewell is almost here! Get ready for a beautiful evening of performances and memories. See you this Saturday at 4:00 PM at Alwin Memorial Public School!',
+  '🎭 Performances registrations are open! If you\'d like to perform — dance, music, drama, anything — reach out and register. Let\'s make the stage shine! ✨'
+];
+
+function api(path,opts){
+  return fetch(SUPA_URL+'/rest/v1/'+path,Object.assign({
+    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=representation'}
+  },opts||{})).then(function(r){return r.json()}).catch(function(){return null});
+}
+function setSetting(key,val){
+  return api('settings',{method:'POST',body:JSON.stringify({key:key,value:String(val)}),headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=representation'}});
+}
+
+function unlock(){
+  var v=document.getElementById('pwd-input').value;
+  if(v===PASS){
+    document.getElementById('lock-screen').style.display='none';
+    document.getElementById('main-app').style.display='block';
+    document.getElementById('logout-btn').style.display='block';
+    init();
+  }else{
+    document.getElementById('lock-error').textContent='Wrong password. Try again.';
+    document.getElementById('pwd-input').value='';
+  }
+}
+function logout(){
+  document.getElementById('lock-screen').style.display='flex';
+  document.getElementById('main-app').style.display='none';
+  document.getElementById('logout-btn').style.display='none';
+  document.getElementById('pwd-input').value='';
+}
+
+function init(){
+  renderQuick();
+  loadSettings();
+  loadAnn();
+  loadPaySettings();
+  loadTracker();
+  loadPerf();
+  loadSuggestions();
+  setInterval(function(){loadAnn();loadTracker();loadSuggestions();},20000);
+}
+
+function getTarget(){return TARGET}
+function tick(){
+  if(!TARGET)return;
+  var diff=TARGET-new Date();
+  if(diff<=0){['cd-d','cd-h','cd-m','cd-s'].forEach(function(id){document.getElementById(id).textContent='00'});return}
+  var d=Math.floor(diff/86400000);diff-=d*86400000;
+  var h=Math.floor(diff/3600000);diff-=h*3600000;
+  var m=Math.floor(diff/60000);diff-=m*60000;var s=Math.floor(diff/1000);
+  document.getElementById('cd-d').textContent=String(d).padStart(2,'0');
+  document.getElementById('cd-h').textContent=String(h).padStart(2,'0');
+  document.getElementById('cd-m').textContent=String(m).padStart(2,'0');
+  document.getElementById('cd-s').textContent=String(s).padStart(2,'0');
+}
+setInterval(tick,1000);
+
+function updateHeader(title,venue,time){
+  if(title)document.getElementById('hdr-title').textContent=title;
+  if(venue)document.getElementById('hdr-venue').textContent=venue;
+  if(time){var h=+time.split(':')[0],mn=time.split(':')[1];document.getElementById('hdr-time').textContent=(h%12||12)+':'+mn+' '+(h>=12?'PM':'AM')}
+}
+
+function switchTab(id){
+  ['announce','money','tracker','perform','suggestions','settings'].forEach(function(t){
+    document.getElementById('tab-'+t).classList.remove('active');
+    document.querySelector('[onclick="switchTab(\''+t+'\')"]').classList.remove('active');
+  });
+  document.getElementById('tab-'+id).classList.add('active');
+  document.querySelector('[onclick="switchTab(\''+id+'\')"]').classList.add('active');
+}
+
+function toast(msg){var el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(function(){el.classList.remove('show')},2500)}
+
+/* Settings */
+function loadSettings(){
+  api('settings?select=key,value').then(function(rows){
+    if(!rows)return;
+    var s={};rows.forEach(function(r){s[r.key]=r.value});
+    var title=s.title||'Farewell Evening';
+    var venue=s.venue||'Alwin Memorial Public School';
+    var time=s.time||'16:00';
+    updateHeader(title,venue,time);
+    document.getElementById('set-name').value=title;
+    document.getElementById('set-venue').value=venue;
+    document.getElementById('set-time').value=time;
+    if(s.headcount){HEADCOUNT=parseInt(s.headcount)||0;document.getElementById('set-headcount').value=s.headcount}
+    if(s.date){
+      document.getElementById('set-date').value=s.date;
+      var p=s.date.split('-').map(Number),tp=time.split(':');
+      TARGET=new Date(p[0],p[1]-1,p[2],+tp[0],+tp[1],0,0);
+    }else{
+      var d=new Date(),day=d.getDay(),diff=(6-day+7)%7||7;
+      d.setDate(d.getDate()+diff);d.setHours(16,0,0,0);TARGET=d;
+      var pad=function(n){return String(n).padStart(2,'0')};
+      document.getElementById('set-date').value=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+    }
+  });
+}
+function saveSettings(){
+  var name=document.getElementById('set-name').value.trim();
+  var date=document.getElementById('set-date').value;
+  var time=document.getElementById('set-time').value;
+  var venue=document.getElementById('set-venue').value.trim();
+  var hc=document.getElementById('set-headcount').value.trim();
+  var pwd=document.getElementById('set-pwd').value;
+  var saves=[];
+  if(name)saves.push(setSetting('title',name));
+  if(venue)saves.push(setSetting('venue',venue));
+  if(date)saves.push(setSetting('date',date));
+  if(time)saves.push(setSetting('time',time));
+  if(hc){saves.push(setSetting('headcount',hc));HEADCOUNT=parseInt(hc)||0}
+  if(pwd)PASS=pwd;
+  Promise.all(saves).then(function(){
+    if(date&&time){var p=date.split('-').map(Number),tp=time.split(':');TARGET=new Date(p[0],p[1]-1,p[2],+tp[0],+tp[1],0,0)}
+    updateHeader(name,venue,time);
+    toast('Settings saved — live for everyone!');
+  });
+}
+
+/* Quick templates */
+function renderQuick(){
+  document.getElementById('quick-list').innerHTML=QUICK.map(function(q,i){
+    return '<button class="quick-btn" onclick="useQuick('+i+')">'+(q.length>95?q.slice(0,95)+'…':q)+'</button>';
+  }).join('');
+}
+function useQuick(i){document.getElementById('ann-text').value=QUICK[i]}
+
+/* Announcements */
+function loadAnn(){
+  api('announcements?select=*&order=created_at.desc').then(function(rows){
+    var feed=document.getElementById('ann-feed');
+    if(!rows||!rows.length){feed.innerHTML='<div class="ann-empty">No announcements yet.</div>';return}
+    feed.innerHTML=rows.map(function(a){
+      var d=new Date(a.created_at);
+      var meta=d.toLocaleDateString('en-IN',{day:'numeric',month:'short'})+' · '+d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+      return '<div class="ann-item"><div class="ann-meta"><span>'+meta+'</span><button class="del-btn" onclick="delAnn('+a.id+')">×</button></div><div class="ann-text">'+a.text.replace(/\n/g,'<br>')+'</div></div>';
+    }).join('');
+  });
+}
+function postAnn(){
+  var txt=document.getElementById('ann-text').value.trim();
+  if(!txt){toast('Write something first');return}
+  api('announcements',{method:'POST',body:JSON.stringify({text:txt})}).then(function(){
+    document.getElementById('ann-text').value='';
+    loadAnn();toast('Posted — visible to everyone instantly!');
+  });
+}
+function delAnn(id){
+  api('announcements?id=eq.'+id,{method:'DELETE'}).then(function(){loadAnn();toast('Deleted')});
+}
+
+/* Payment */
+function updatePreview(){
+  var amt=document.getElementById('amt-in').value.trim();
+  document.getElementById('pay-demo').textContent='💳 Pay '+(amt?'₹'+amt:'₹—')+' for Farewell';
+}
+function uploadQR(e){
+  var file=e.target.files[0];if(!file)return;
+  var r=new FileReader();
+  r.onload=function(ev){
+    document.getElementById('qr-img').src=ev.target.result;
+    document.getElementById('qr-img').style.display='block';
+    document.getElementById('qr-icon').style.display='none';
+    setSetting('qr',ev.target.result).then(function(){toast('QR saved!')});
+  };r.readAsDataURL(file);
+}
+function loadPaySettings(){
+  api('settings?select=key,value&key=in.(upi,amt,payee,deadline,qr)').then(function(rows){
+    if(!rows)return;
+    var s={};rows.forEach(function(r){s[r.key]=r.value});
+    if(s.upi)document.getElementById('upi-in').value=s.upi;
+    if(s.amt)document.getElementById('amt-in').value=s.amt;
+    if(s.payee)document.getElementById('payee-in').value=s.payee;
+    if(s.deadline)document.getElementById('deadline-in').value=s.deadline;
+    if(s.qr){document.getElementById('qr-img').src=s.qr;document.getElementById('qr-img').style.display='block';document.getElementById('qr-icon').style.display='none'}
+    updatePreview();
+  });
+}
+function savePayInfo(){
+  var upi=document.getElementById('upi-in').value.trim();
+  var amt=document.getElementById('amt-in').value.trim();
+  var payee=document.getElementById('payee-in').value.trim();
+  var deadline=document.getElementById('deadline-in').value.trim();
+  Promise.all([setSetting('upi',upi),setSetting('amt',amt),setSetting('payee',payee),setSetting('deadline',deadline)]).then(function(){
+    toast('Payment info saved — live instantly!');
+  });
+}
+
+/* Tracker */
+function loadTracker(){
+  api('payments?select=*&order=created_at.desc').then(function(rows){
+    var total=0,count=(rows||[]).length;
+    (rows||[]).forEach(function(p){total+=parseFloat(p.amount)||0});
+    document.getElementById('stat-count').textContent=count;
+    document.getElementById('stat-total').textContent='₹'+Math.round(total).toLocaleString('en-IN');
+    document.getElementById('stat-pending').textContent=HEADCOUNT>0?Math.max(0,HEADCOUNT-count):'—';
+    var body=document.getElementById('tracker-body');
+    if(!rows||!rows.length){body.innerHTML='<div class="tracker-empty">No payments recorded yet.</div>';return}
+    var html=rows.map(function(p){
+      var d=new Date(p.created_at);
+      var t=d.toLocaleDateString('en-IN',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+      return '<tr><td><strong>'+p.name+'</strong>'+(p.class?'<br><span style="font-size:11px;color:var(--muted)">'+p.class+'</span>':'')+
+      '</td><td>'+(p.amount?'₹'+p.amount:'—')+'</td>'+
+      '<td>'+(p.txn_id?'<span class="txn">'+p.txn_id+'</span>':'<span style="color:var(--muted)">—</span>')+'</td>'+
+      '<td style="font-size:11px;">'+t+'</td>'+
+      '<td><span class="paid-badge">✓ Paid</span></td>'+
+      '<td><button class="del-btn" onclick="delPayment('+p.id+')">×</button></td></tr>';
+    }).join('');
+    body.innerHTML='<div style="overflow-x:auto"><table class="tracker-table"><thead><tr><th>Name</th><th>Amount</th><th>Txn ID</th><th>Time</th><th>Status</th><th></th></tr></thead><tbody>'+html+'</tbody></table></div>';
+  });
+}
+function manualAdd(){
+  var name=document.getElementById('m-name').value.trim();
+  if(!name){toast('Enter a name');return}
+  var cls=document.getElementById('m-class').value.trim();
+  var amt=document.getElementById('m-amt').value.trim();
+  var txn=document.getElementById('m-txn').value.trim();
+  api('payments',{method:'POST',body:JSON.stringify({name:name,class:cls||null,amount:amt||null,txn_id:txn||null})}).then(function(){
+    document.getElementById('m-name').value='';document.getElementById('m-class').value='';
+    document.getElementById('m-amt').value='';document.getElementById('m-txn').value='';
+    loadTracker();toast(name+' marked as paid!');
+  });
+}
+function delPayment(id){
+  api('payments?id=eq.'+id,{method:'DELETE'}).then(function(){loadTracker();toast('Removed')});
+}
+
+/* Performances */
+var tagMap={Dance:'tag-dance',Music:'tag-music',Drama:'tag-drama',Standup:'tag-standup',Other:'tag-other'};
+function loadPerf(){
+  api('performances?select=*&order=created_at.asc').then(function(rows){
+    var list=document.getElementById('perf-list'),summ=document.getElementById('perf-summ');
+    if(!rows||!rows.length){list.innerHTML='<div class="ann-empty">No performances added yet.</div>';summ.style.display='none';return}
+    list.innerHTML=rows.map(function(p){
+      return '<div class="reg-card"><div><div class="reg-name">'+p.name+'</div>'+(p.class?'<div class="reg-cls">'+p.class+'</div>':'')+
+      '</div><div class="reg-right">'+(p.duration?'<span class="dur-txt">'+p.duration+'m</span>':'')+
+      '<span class="tag '+(tagMap[p.type]||'tag-other')+'">'+p.type+'</span>'+
+      '<button class="del-btn" onclick="delPerf('+p.id+')">×</button></div></div>';
+    }).join('');
+    var counts={};rows.forEach(function(p){counts[p.type]=(counts[p.type]||0)+1});
+    summ.style.display='grid';
+    summ.innerHTML=Object.entries(counts).map(function(e){
+      return '<div class="summ-cell"><div class="summ-num">'+e[1]+'</div><div class="summ-lbl">'+e[0]+'</div></div>';
+    }).join('')+'<div class="summ-cell"><div class="summ-num">'+rows.length+'</div><div class="summ-lbl">Total</div></div>';
+  });
+}
+function addPerf(){
+  var name=document.getElementById('p-name').value.trim();
+  var cls=document.getElementById('p-class').value.trim();
+  var type=document.getElementById('p-type').value;
+  var dur=document.getElementById('p-dur').value.trim();
+  if(!name){toast('Enter a name');return}
+  if(!type){toast('Select type');return}
+  api('performances',{method:'POST',body:JSON.stringify({name:name,class:cls||null,type:type,duration:dur||null})}).then(function(){
+    document.getElementById('p-name').value='';document.getElementById('p-class').value='';
+    document.getElementById('p-type').value='';document.getElementById('p-dur').value='';
+    loadPerf();toast(name+' added to lineup!');
+  });
+}
+function delPerf(id){
+  api('performances?id=eq.'+id,{method:'DELETE'}).then(function(){loadPerf();toast('Removed')});
+}
+
+/* Suggestions */
+function loadSuggestions(){
+  api('suggestions?select=*&order=created_at.desc').then(function(rows){
+    var feed=document.getElementById('sug-feed');
+    if(!rows||!rows.length){feed.innerHTML='<div class="sug-empty">No suggestions yet. They\'ll appear here once the audience submits.</div>';return}
+    feed.innerHTML=rows.map(function(s){
+      var d=new Date(s.created_at);
+      var meta=d.toLocaleDateString('en-IN',{day:'numeric',month:'short'})+' · '+d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+      return '<div class="sug-item"><div class="sug-meta"><span>'+meta+'</span><button class="del-btn" onclick="delSug('+s.id+')">×</button></div>'+
+      '<div class="sug-text">'+s.text.replace(/\n/g,'<br>')+'</div>'+
+      (s.author_name?'<div class="sug-author">— '+s.author_name+'</div>':'')+
+      '</div>';
+    }).join('');
+  });
+}
+function delSug(id){
+  api('suggestions?id=eq.'+id,{method:'DELETE'}).then(function(){loadSuggestions();toast('Removed')});
+}
+</script>
+</body>
+</html>
