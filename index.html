@@ -52,8 +52,8 @@ header{text-align:center;padding:3.5rem 1rem 2rem}
 .pay-sub{font-size:12px;color:var(--muted);text-align:center;margin-bottom:16px;font-weight:300}
 .divider{display:flex;align-items:center;gap:10px;margin:16px 0;font-size:11px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;font-weight:300}
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border-strong)}
-.qr-row{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap}
-.qr-box{width:130px;height:130px;flex-shrink:0;border:1px solid var(--border-strong);border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.qr-row{display:flex;flex-direction:column;align-items:center;gap:14px}
+.qr-box{width:220px;height:220px;flex-shrink:0;border:1px solid var(--border-strong);border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center}
 .qr-box img{width:100%;height:100%;object-fit:contain}
 .qr-no{font-size:13px;color:var(--muted);text-align:center;font-style:italic;padding:1rem}
 .upi-detail{font-size:13px;color:var(--muted);margin-top:6px;font-weight:300}.upi-detail strong{color:var(--ink);font-weight:500}
@@ -259,21 +259,20 @@ function loadPay(){
     /* Deadline banner */
     if(deadline){out+='<div class="deadline-banner"><div class="deadline-icon">⏰</div><div class="deadline-txt">Please contribute by <strong>'+deadline+'</strong>. Your support means the world to us! 🙏</div></div>'}
 
-    /* Pay button */
-    if(upiLink&&mob){
+    /* Pay button — show on ALL devices */
+    if(upiLink){
       out+='<a class="pay-btn" href="'+upiLink+'">💳 Pay ₹'+amt+' for Farewell</a>';
-      out+='<div class="pay-sub">Tap to open GPay / PhonePe / Paytm</div>';
+      out+='<div class="pay-sub">'+(mob?'Tap':'Click')+' to open GPay / PhonePe / Paytm</div>';
     }
 
-    /* QR for desktop */
+    /* QR code — always show if uploaded */
     if(qr||upi){
-      if(mob&&upiLink)out+='<div class="divider">or scan QR</div>';
-      out+='<div class="qr-row"><div class="qr-box">'+(qr?'<img src="'+qr+'" alt="QR"/>':'<div class="qr-no">QR coming soon</div>')+'</div>';
-      out+='<div>';
-      if(!mob&&upiLink)out+='<a class="pay-btn" href="'+upiLink+'" style="width:auto;padding:12px 20px;display:inline-block;margin-bottom:10px;">💳 Pay ₹'+amt+' for Farewell</a>';
-      if(upi)out+='<div class="upi-detail">UPI: <strong>'+upi+'</strong></div>';
-      out+='<div class="upi-detail" style="margin-top:4px;">Amount: <strong>₹'+amt+'</strong></div>';
-      out+='</div></div>';
+      if(upiLink)out+='<div class="divider">or scan QR</div>';
+      out+='<div class="qr-row">';
+      out+='<div class="qr-box">'+(qr?'<img src="'+qr+'" alt="Payment QR"/>':'<div class="qr-no">QR coming soon</div>')+'</div>';
+      if(upi)out+='<div class="upi-detail" style="text-align:center;">UPI: <strong>'+upi+'</strong></div>';
+      out+='<div class="upi-detail" style="text-align:center;">Amount: <strong>₹'+amt+'</strong></div>';
+      out+='</div>';
     }
     if(!upiLink&&!qr&&!upi)out='<div class="empty-state">Payment details coming soon!</div>';
 
